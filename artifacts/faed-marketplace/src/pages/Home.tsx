@@ -96,10 +96,10 @@ export default function Home() {
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { name: 'عباءات', img: 'https://images.unsplash.com/photo-1583744946564-b52ac1c389c8?w=500&h=500&fit=crop', category: 'عباءات' },
-              { name: 'فساتين سهرة', img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500&h=500&fit=crop', category: 'فساتين' },
-              { name: 'بدلات وقمصان', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop', category: 'بدلات' },
-              { name: 'أقمشة ونسيج', img: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=500&h=500&fit=crop', category: 'أقمشة' },
+              { name: 'عباءات', img: '/products/abaya.png', category: 'عباءات' },
+              { name: 'فساتين سهرة', img: '/products/evening-dress.png', category: 'فساتين' },
+              { name: 'بدلات وقمصان', img: '/products/suit.png', category: 'بدلات' },
+              { name: 'أقمشة ونسيج', img: '/products/cashmere-fabric.png', category: 'أقمشة' },
             ].map((cat, i) => (
               <Link key={i} href={`/products?category=${cat.category}`} className="group relative overflow-hidden rounded-2xl aspect-[4/5] block">
                 {/* category placeholder */}
