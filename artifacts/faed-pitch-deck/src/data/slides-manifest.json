@@ -72,8 +72,16 @@
     "speakerNotes": ""
   },
   {
-    "id": "d9e0f1a2-b3c4-5678-defa-901234567890",
+    "id": "f1e2d3c4-b5a6-7890-fedc-ba9876543210",
     "position": 10,
+    "filepath": "src/pages/slides/ArchitectureSlide.tsx",
+    "title": "§7 Architecture Diagram — مخطط البنية التقنية",
+    "description": "Data Warehouse Architecture Diagram",
+    "speakerNotes": ""
+  },
+  {
+    "id": "d9e0f1a2-b3c4-5678-defa-901234567890",
+    "position": 11,
     "filepath": "src/pages/slides/SustainabilitySlide.tsx",
     "title": "§8 خارطة الطريق — Roadmap",
     "description": "Phase 1 MVP · Phase 2 Tools · Phase 3 Mobile+AI",
@@ -81,7 +89,7 @@
   },
   {
     "id": "e0f1a2b3-c4d5-6789-efab-012345678901",
-    "position": 11,
+    "position": 12,
     "filepath": "src/pages/slides/ClosingSlide.tsx",
     "title": "جرّب المنصة — Try the Platform",
     "description": "Call to action — تجربة المنصة",
