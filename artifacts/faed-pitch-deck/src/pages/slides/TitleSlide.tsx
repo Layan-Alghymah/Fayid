@@ -21,12 +21,13 @@ export default function TitleSlide() {
         <div className="text-[1.1vw] tracking-[0.25em] font-light uppercase mb-[3vh]" style={{ color: "rgba(201,168,76,0.55)", fontFamily: "IBM Plex Sans" }}>
           وثيقة متطلبات المنتج
         </div>
-        <h1 className="font-black leading-none tracking-tight" style={{ fontSize: "9vw", color: "#f5f2ee", fontFamily: "Cairo", lineHeight: 1 }}>
-          فائض
-        </h1>
-        <div className="mt-[1.5vh] text-[3vw] font-light tracking-[0.4em]" style={{ color: "rgba(201,168,76,0.8)", fontFamily: "Cairo" }}>
-          FAED PLATFORM
-        </div>
+
+        <img
+          src={`${import.meta.env.BASE_URL}logo-dark-landscape.png`}
+          alt="Faed Platform"
+          style={{ height: "11vw", width: "auto", objectFit: "contain", objectPosition: "right center" }}
+          className="mb-[3vh]"
+        />
 
         <div className="mt-[4vh] max-w-[58vw]">
           <p className="text-[1.8vw] font-light leading-relaxed" style={{ color: "rgba(212,234,236,0.8)", fontFamily: "Cairo" }}>

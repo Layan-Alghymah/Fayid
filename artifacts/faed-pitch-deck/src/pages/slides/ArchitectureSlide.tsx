@@ -1,6 +1,10 @@
 export default function ArchitectureSlide() {
   return (
     <div className="relative w-screen h-screen overflow-hidden" style={{ background: "linear-gradient(150deg, #0c2e3a 0%, #0F3D4F 50%, #195155 100%)" }}>
+      {/* Brand Logo */}
+      <div className="absolute top-[3.5vh] right-[3.5vw] z-50">
+        <img src={`${import.meta.env.BASE_URL}logo-dark.png`} alt="Faed" style={{ height: "3.2vw", width: "auto", objectFit: "contain" }} />
+      </div>
       <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 50% 50%, rgba(201,168,76,0.06) 0%, transparent 65%)" }} />
       <div className="absolute top-0 left-0 w-full h-[3px]" style={{ background: "linear-gradient(90deg, transparent, #c9a84c 40%, #c9a84c 60%, transparent)" }} />
 

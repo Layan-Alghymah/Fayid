@@ -1,6 +1,10 @@
 export default function SolutionSlide() {
   return (
     <div className="relative w-screen h-screen overflow-hidden" style={{ background: "linear-gradient(155deg, #0F3D4F 0%, #195155 100%)" }}>
+      {/* Brand Logo */}
+      <div className="absolute top-[3.5vh] right-[3.5vw] z-50">
+        <img src={`${import.meta.env.BASE_URL}logo-dark.png`} alt="Faed" style={{ height: "3.2vw", width: "auto", objectFit: "contain" }} />
+      </div>
       <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 90% 10%, rgba(201,168,76,0.08) 0%, transparent 50%)" }} />
 
       <div className="absolute inset-0 px-[7vw] py-[7vh] flex flex-col">

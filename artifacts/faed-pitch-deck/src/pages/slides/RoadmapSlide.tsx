@@ -1,6 +1,10 @@
 export default function RoadmapSlide() {
   return (
     <div className="relative w-screen h-screen overflow-hidden" style={{ background: "#f5f2ee" }}>
+      {/* Brand Logo */}
+      <div className="absolute top-[3.5vh] right-[3.5vw] z-50">
+        <img src={`${import.meta.env.BASE_URL}logo-light.png`} alt="Faed" style={{ height: "3.2vw", width: "auto", objectFit: "contain" }} />
+      </div>
       <div className="absolute top-0 left-0 w-full h-[4px]" style={{ background: "linear-gradient(90deg, #195155, #c9a84c, #0F3D4F)" }} />
 
       <div className="absolute inset-0 px-[7vw] pt-[7vh] pb-[5vh] flex flex-col">

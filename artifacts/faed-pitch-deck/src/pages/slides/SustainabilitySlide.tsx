@@ -1,6 +1,10 @@
 export default function SustainabilitySlide() {
   return (
     <div className="relative w-screen h-screen overflow-hidden" style={{ background: "#f5f2ee" }}>
+      {/* Brand Logo */}
+      <div className="absolute top-[3.5vh] right-[3.5vw] z-50">
+        <img src={`${import.meta.env.BASE_URL}logo-light.png`} alt="Faed" style={{ height: "3.2vw", width: "auto", objectFit: "contain" }} />
+      </div>
       <div className="absolute top-0 left-0 w-full h-[4px]" style={{ background: "linear-gradient(90deg, #195155, #c9a84c, #0F3D4F)" }} />
       <div className="absolute bottom-0 right-0 w-[40vw] h-[35vh]" style={{ background: "radial-gradient(ellipse at bottom right, rgba(25,81,85,0.05) 0%, transparent 70%)" }} />
 

@@ -1,6 +1,10 @@
 export default function FinancialsSlide() {
   return (
     <div className="relative w-screen h-screen overflow-hidden" style={{ background: "linear-gradient(145deg, #0a2530 0%, #0F3D4F 50%, #195155 100%)" }}>
+      {/* Brand Logo */}
+      <div className="absolute top-[3.5vh] right-[3.5vw] z-50">
+        <img src={`${import.meta.env.BASE_URL}logo-dark.png`} alt="Faed" style={{ height: "3.2vw", width: "auto", objectFit: "contain" }} />
+      </div>
       <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 80% 90%, rgba(201,168,76,0.07) 0%, transparent 55%)" }} />
 
       <div className="absolute inset-0 px-[7vw] py-[6vh] flex flex-col">

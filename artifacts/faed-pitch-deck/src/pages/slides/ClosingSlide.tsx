@@ -6,12 +6,11 @@ export default function ClosingSlide() {
       <div className="absolute bottom-0 left-0 w-full h-[3px]" style={{ background: "linear-gradient(90deg, transparent, rgba(25,81,85,0.6) 40%, rgba(25,81,85,0.6) 60%, transparent)" }} />
 
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-[4vh] px-[10vw]">
-        <div className="font-black text-center" style={{ fontSize: "7vw", color: "#f5f2ee", fontFamily: "Cairo", lineHeight: 1 }}>
-          فائض
-        </div>
-        <div className="text-[2vw] font-light tracking-[0.4em] text-center" style={{ color: "rgba(201,168,76,0.75)", fontFamily: "Cairo" }}>
-          FAED PLATFORM
-        </div>
+        <img
+          src={`${import.meta.env.BASE_URL}logo-dark-landscape.png`}
+          alt="Faed Platform"
+          style={{ height: "8vw", width: "auto", objectFit: "contain" }}
+        />
 
         <div className="w-[18vw] h-[2px] my-[1vh]" style={{ background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent)" }} />
 
