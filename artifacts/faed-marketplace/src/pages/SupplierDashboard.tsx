@@ -179,9 +179,12 @@ export default function SupplierDashboard() {
                   <div>
                     <label className="block text-sm mb-2">القسم</label>
                     <select {...register("category")} className="w-full bg-background/50 border border-border rounded-xl px-4 h-12 text-sm focus:outline-none focus:border-primary">
-                      <option value="textiles">أقمشة</option>
-                      <option value="apparel">ملابس جاهزة</option>
-                      <option value="accessories">إكسسوارات</option>
+                      <option value="عباءات">عباءات</option>
+                      <option value="حجابات">حجابات</option>
+                      <option value="فساتين">فساتين</option>
+                      <option value="بدلات">بدلات</option>
+                      <option value="قمصان">قمصان</option>
+                      <option value="أقمشة">أقمشة</option>
                     </select>
                   </div>
                   <div>

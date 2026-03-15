@@ -30,9 +30,12 @@ export default function Products() {
 
   const categories = [
     { id: '', name: 'الكل' },
-    { id: 'textiles', name: 'أقمشة' },
-    { id: 'apparel', name: 'ملابس جاهزة' },
-    { id: 'accessories', name: 'إكسسوارات' },
+    { id: 'عباءات', name: 'عباءات' },
+    { id: 'حجابات', name: 'حجابات' },
+    { id: 'فساتين', name: 'فساتين' },
+    { id: 'بدلات', name: 'بدلات' },
+    { id: 'قمصان', name: 'قمصان' },
+    { id: 'أقمشة', name: 'أقمشة' },
   ];
 
   return (

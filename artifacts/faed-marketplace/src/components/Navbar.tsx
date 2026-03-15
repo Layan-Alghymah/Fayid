@@ -39,10 +39,10 @@ export function Navbar() {
               <Link href="/products" className={cn("text-sm font-semibold hover:text-primary transition-colors", location === "/products" ? "text-primary" : "text-foreground")}>
                 تصفح المنتجات
               </Link>
-              <Link href="/products?category=textiles" className="text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">
+              <Link href="/products?category=أقمشة" className="text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">
                 أقمشة
               </Link>
-              <Link href="/products?category=apparel" className="text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">
+              <Link href="/products?category=فساتين" className="text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">
                 ملابس
               </Link>
             </div>
