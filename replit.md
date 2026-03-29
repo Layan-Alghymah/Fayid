@@ -91,6 +91,8 @@ Generated Zod schemas from the OpenAPI spec (e.g. `HealthCheckResponse`). Used b
 
 Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHealthCheck`, `healthCheck`).
 
+**Auth note**: `custom-fetch.ts` automatically reads `auth_token` from `localStorage` and attaches it as `Authorization: Bearer <token>` to all API requests. Token is stored on login in `Auth.tsx` and cleared on logout in `AuthContext.tsx`.
+
 ### `scripts` (`@workspace/scripts`)
 
 Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.

@@ -1,9 +1,10 @@
 import { Router, type IRouter } from "express";
 import { db } from "@workspace/db";
-import { productsTable, suppliersTable, ordersTable, orderItemsTable } from "@workspace/db";
-import { eq, inArray } from "drizzle-orm";
+import { productsTable, suppliersTable, ordersTable, orderItemsTable, discountCodesTable } from "@workspace/db";
+import { eq, inArray, desc } from "drizzle-orm";
 import { requireAuth, requireRole } from "../middleware/requireAuth";
 import { CreateProductBody, UpdateProductParams, UpdateProductBody, DeleteProductParams } from "@workspace/api-zod";
+import { z } from "zod";
 
 const router: IRouter = Router();
 
@@ -250,6 +251,156 @@ router.get("/supplier/stats", requireAuth, requireRole("supplier"), async (req, 
     totalRevenue,
     pendingOrders,
   });
+});
+
+router.get("/supplier/analytics", requireAuth, requireRole("supplier"), async (req, res): Promise<void> => {
+  const supplier = await getSupplierForUser(req.user!.userId);
+  if (!supplier) { res.status(404).json({ error: "Supplier not found" }); return; }
+
+  const products = await db.select().from(productsTable).where(eq(productsTable.supplierId, supplier.id));
+  const productIds = products.map(p => p.id);
+
+  if (productIds.length === 0) {
+    res.json({ monthly: [], topProducts: [], totalRevenue: 0 });
+    return;
+  }
+
+  const orderItems = await db.select().from(orderItemsTable).where(inArray(orderItemsTable.productId, productIds));
+  const orderIds = [...new Set(orderItems.map(i => i.orderId))];
+  const orders = orderIds.length > 0 ? await db.select().from(ordersTable).where(inArray(ordersTable.id, orderIds)) : [];
+
+  const monthlyMap: Record<string, { revenue: number; orders: number }> = {};
+  for (const order of orders) {
+    const date = new Date(order.createdAt ?? new Date());
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    if (!monthlyMap[key]) monthlyMap[key] = { revenue: 0, orders: 0 };
+    monthlyMap[key].orders++;
+    const items = orderItems.filter(i => i.orderId === order.id);
+    monthlyMap[key].revenue += items.reduce((s, i) => s + i.price * i.quantity, 0);
+  }
+
+  const monthly = Object.entries(monthlyMap)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .slice(-6)
+    .map(([month, data]) => ({ month, ...data }));
+
+  const productRevenueMap: Record<number, { name: string; revenue: number; units: number }> = {};
+  for (const item of orderItems) {
+    if (!productRevenueMap[item.productId]) {
+      productRevenueMap[item.productId] = { name: item.productName, revenue: 0, units: 0 };
+    }
+    productRevenueMap[item.productId].revenue += item.price * item.quantity;
+    productRevenueMap[item.productId].units += item.quantity;
+  }
+
+  const topProducts = Object.values(productRevenueMap)
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 5);
+
+  res.json({ monthly, topProducts });
+});
+
+const CreateDiscountBody = z.object({
+  code: z.string().min(3).max(20).toUpperCase(),
+  discountType: z.enum(["percentage", "fixed"]),
+  discountValue: z.number().min(1),
+  minOrderAmount: z.number().optional(),
+  maxUses: z.number().optional(),
+  expiresAt: z.string().optional(),
+});
+
+router.get("/supplier/discounts", requireAuth, requireRole("supplier"), async (req, res): Promise<void> => {
+  const supplier = await getSupplierForUser(req.user!.userId);
+  if (!supplier) { res.status(404).json({ error: "Supplier not found" }); return; }
+
+  const codes = await db
+    .select()
+    .from(discountCodesTable)
+    .where(eq(discountCodesTable.supplierId, supplier.id))
+    .orderBy(desc(discountCodesTable.createdAt));
+
+  res.json(codes.map(c => ({
+    ...c,
+    createdAt: c.createdAt?.toISOString() ?? new Date().toISOString(),
+    expiresAt: c.expiresAt?.toISOString() ?? null,
+  })));
+});
+
+router.post("/supplier/discounts", requireAuth, requireRole("supplier"), async (req, res): Promise<void> => {
+  const parsed = CreateDiscountBody.safeParse(req.body);
+  if (!parsed.success) { res.status(400).json({ error: parsed.error.message }); return; }
+
+  const supplier = await getSupplierForUser(req.user!.userId);
+  if (!supplier) { res.status(404).json({ error: "Supplier not found" }); return; }
+
+  const { code, discountType, discountValue, minOrderAmount, maxUses, expiresAt } = parsed.data;
+
+  try {
+    const [created] = await db.insert(discountCodesTable).values({
+      supplierId: supplier.id,
+      code,
+      discountType,
+      discountValue,
+      minOrderAmount: minOrderAmount ?? null,
+      maxUses: maxUses ?? null,
+      expiresAt: expiresAt ? new Date(expiresAt) : null,
+    }).returning();
+
+    res.status(201).json({
+      ...created,
+      createdAt: created.createdAt?.toISOString() ?? new Date().toISOString(),
+      expiresAt: created.expiresAt?.toISOString() ?? null,
+    });
+  } catch (e: any) {
+    if (e.code === "23505") {
+      res.status(409).json({ error: "هذا الكود مستخدم بالفعل" });
+    } else {
+      res.status(500).json({ error: "حدث خطأ" });
+    }
+  }
+});
+
+router.patch("/supplier/discounts/:id", requireAuth, requireRole("supplier"), async (req, res): Promise<void> => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
+
+  const supplier = await getSupplierForUser(req.user!.userId);
+  if (!supplier) { res.status(404).json({ error: "Supplier not found" }); return; }
+
+  const [existing] = await db.select().from(discountCodesTable).where(eq(discountCodesTable.id, id));
+  if (!existing || existing.supplierId !== supplier.id) { res.status(404).json({ error: "Not found" }); return; }
+
+  const allowed = z.object({
+    isActive: z.boolean().optional(),
+    discountValue: z.number().optional(),
+    maxUses: z.number().nullable().optional(),
+    expiresAt: z.string().nullable().optional(),
+  });
+  const body = allowed.safeParse(req.body);
+  if (!body.success) { res.status(400).json({ error: body.error.message }); return; }
+
+  const updates: any = {};
+  if (body.data.isActive !== undefined) updates.isActive = body.data.isActive;
+  if (body.data.discountValue !== undefined) updates.discountValue = body.data.discountValue;
+  if (body.data.maxUses !== undefined) updates.maxUses = body.data.maxUses;
+  if (body.data.expiresAt !== undefined) updates.expiresAt = body.data.expiresAt ? new Date(body.data.expiresAt) : null;
+
+  const [updated] = await db.update(discountCodesTable).set(updates).where(eq(discountCodesTable.id, id)).returning();
+  res.json({ ...updated, createdAt: updated.createdAt?.toISOString() ?? "", expiresAt: updated.expiresAt?.toISOString() ?? null });
+});
+
+router.delete("/supplier/discounts/:id", requireAuth, requireRole("supplier"), async (req, res): Promise<void> => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) { res.status(400).json({ error: "Invalid id" }); return; }
+
+  const supplier = await getSupplierForUser(req.user!.userId);
+  if (!supplier) { res.status(404).json({ error: "Supplier not found" }); return; }
+
+  const [existing] = await db.select().from(discountCodesTable).where(eq(discountCodesTable.id, id));
+  if (!existing || existing.supplierId !== supplier.id) { res.status(404).json({ error: "Not found" }); return; }
+
+  await db.delete(discountCodesTable).where(eq(discountCodesTable.id, id));
+  res.json({ success: true });
 });
 
 export default router;

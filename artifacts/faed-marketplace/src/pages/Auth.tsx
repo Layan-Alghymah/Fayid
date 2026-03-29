@@ -19,9 +19,19 @@ export default function Auth() {
     name: '', email: '', password: '', businessName: ''
   });
 
-  const handleSuccess = () => {
+  const handleSuccess = (data: any) => {
+    if (data?.token) {
+      localStorage.setItem("auth_token", data.token);
+    }
     queryClient.invalidateQueries({ queryKey: [`/api/auth/me`] });
-    setLocation("/");
+    const role = data?.user?.role;
+    if (role === "supplier") {
+      setLocation("/supplier");
+    } else if (role === "admin") {
+      setLocation("/admin");
+    } else {
+      setLocation("/");
+    }
     toast({ title: "مرحباً بك!", description: "تم تسجيل الدخول بنجاح." });
   };
 

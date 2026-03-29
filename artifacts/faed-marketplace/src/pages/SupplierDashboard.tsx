@@ -1,264 +1,212 @@
 import { Layout } from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
-import { useGetSupplierStats, useListSupplierProducts, useListSupplierOrders, useCreateProduct, useDeleteProduct } from "@workspace/api-client-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { formatPrice, translateOrderStatus, translateDiscountReason } from "@/lib/utils";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Package, TrendingUp, ShoppingBag, Plus, Trash2, LayoutDashboard, Clock } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
+import {
+  LayoutDashboard, Package, ShoppingBag, TrendingUp, Tag,
+  Settings, ChevronLeft, Menu, X, Bell, Store
+} from "lucide-react";
+import { OverviewTab } from "@/components/supplier/OverviewTab";
+import { ProductsTab } from "@/components/supplier/ProductsTab";
+import { OrdersTab } from "@/components/supplier/OrdersTab";
+import { SalesTab } from "@/components/supplier/SalesTab";
+import { DiscountsTab } from "@/components/supplier/DiscountsTab";
+import { AddProductTab } from "@/components/supplier/AddProductTab";
+import { useGetSupplierStats } from "@workspace/api-client-react";
 
-const productSchema = z.object({
-  name: z.string().min(3),
-  category: z.string().min(1),
-  price: z.coerce.number().min(1),
-  originalPrice: z.coerce.number().min(1),
-  quantity: z.coerce.number().min(1),
-  discountReason: z.string().optional(),
-  imageUrl: z.string().url().optional().or(z.literal('')),
-  description: z.string().optional(),
-});
+type TabId = "overview" | "products" | "add-product" | "orders" | "sales" | "discounts";
+
+const TABS = [
+  { id: "overview" as TabId, label: "الرئيسية", icon: LayoutDashboard },
+  { id: "products" as TabId, label: "المنتجات", icon: Package },
+  { id: "orders" as TabId, label: "الطلبات", icon: ShoppingBag },
+  { id: "sales" as TabId, label: "المبيعات", icon: TrendingUp },
+  { id: "discounts" as TabId, label: "أكواد الخصم", icon: Tag },
+];
 
 export default function SupplierDashboard() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'add' | 'orders'>('overview');
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { data: stats } = useGetSupplierStats();
 
-  if (!user || user.role !== 'supplier') {
-    setLocation("/");
+  useEffect(() => {
+    if (!isLoading && (!user || user.role !== "supplier")) {
+      setLocation("/");
+    }
+  }, [isLoading, user, setLocation]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user || user.role !== "supplier") {
     return null;
   }
 
-  const { data: stats } = useGetSupplierStats();
-  const { data: products } = useListSupplierProducts();
-  const { data: orders } = useListSupplierOrders();
+  const isApproved = user.supplierStatus === "approved";
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({
-    resolver: zodResolver(productSchema)
-  });
-
-  const createMut = useCreateProduct({
-    mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [`/api/supplier/products`] });
-        queryClient.invalidateQueries({ queryKey: [`/api/supplier/stats`] });
-        toast({ title: "نجاح", description: "تم إضافة المنتج بنجاح." });
-        reset();
-        setActiveTab('products');
-      }
-    }
-  });
-
-  const deleteMut = useDeleteProduct({
-    mutation: {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: [`/api/supplier/products`] });
-        toast({ title: "نجاح", description: "تم الحذف." });
-      }
-    }
-  });
-
-  const onSubmit = (data: any) => {
-    createMut.mutate({ data });
+  const navigate = (tab: TabId) => {
+    setActiveTab(tab);
+    setSidebarOpen(false);
   };
 
   return (
-    <Layout>
-      <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row gap-8 min-h-[80vh]">
-        
+    <Layout hideFooter>
+      <div className="flex min-h-[calc(100vh-64px)]" dir="rtl">
+
+        {/* Mobile overlay */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/60 z-40 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
         {/* Sidebar */}
-        <div className="w-full md:w-64 flex flex-col gap-2">
-          <div className="glass-panel p-6 rounded-2xl mb-4">
-            <h2 className="font-bold text-lg mb-1">{user.name}</h2>
-            <div className="text-xs px-2 py-1 bg-primary/20 text-primary rounded inline-block">
-              {user.supplierStatus === 'approved' ? 'مورد معتمد' : 'بانتظار الاعتماد'}
+        <aside className={`
+          fixed md:sticky top-0 md:top-16 right-0 h-full md:h-[calc(100vh-64px)]
+          w-72 md:w-64 flex-shrink-0 flex flex-col
+          bg-[#0a1f26] border-l border-white/10
+          z-50 md:z-auto transition-transform duration-300
+          ${sidebarOpen ? "translate-x-0" : "translate-x-full md:translate-x-0"}
+        `}>
+          {/* Sidebar Header */}
+          <div className="p-5 border-b border-white/10">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-11 h-11 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center">
+                <Store className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-black text-sm truncate">{user.name}</p>
+                <p className="text-xs text-muted-foreground truncate">مورد في منصة فائض</p>
+              </div>
+              <button className="md:hidden p-1" onClick={() => setSidebarOpen(false)}>
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className={`text-xs px-3 py-1.5 rounded-xl font-bold w-fit flex items-center gap-1.5 ${
+              isApproved
+                ? "bg-green-500/15 text-green-400 border border-green-500/20"
+                : "bg-yellow-500/15 text-yellow-400 border border-yellow-500/20"
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${isApproved ? "bg-green-400" : "bg-yellow-400"} animate-pulse`} />
+              {isApproved ? "مورد معتمد" : "بانتظار الاعتماد"}
             </div>
           </div>
 
-          <nav className="flex flex-col gap-2">
-            {[
-              { id: 'overview', name: 'نظرة عامة', icon: <LayoutDashboard className="w-4 h-4" /> },
-              { id: 'products', name: 'منتجاتي', icon: <Package className="w-4 h-4" /> },
-              { id: 'add', name: 'إضافة منتج', icon: <Plus className="w-4 h-4" /> },
-              { id: 'orders', name: 'الطلبات', icon: <ShoppingBag className="w-4 h-4" /> },
-            ].map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                  activeTab === tab.id 
-                    ? 'bg-primary text-primary-foreground shadow-md' 
-                    : 'hover:bg-white/5 text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {tab.icon}
-                <span className="font-bold text-sm">{tab.name}</span>
-              </button>
-            ))}
+          {/* Quick Stats */}
+          <div className="px-4 py-3 border-b border-white/10">
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { label: "المنتجات", value: stats?.totalProducts ?? 0 },
+                { label: "الطلبات", value: stats?.totalOrders ?? 0 },
+                { label: "انتظار", value: stats?.pendingOrders ?? 0 },
+              ].map((s, i) => (
+                <div key={i} className="bg-white/5 rounded-xl p-2 text-center">
+                  <p className="font-black text-sm text-primary">{s.value}</p>
+                  <p className="text-xs text-muted-foreground">{s.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Nav */}
+          <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+            <p className="text-xs text-muted-foreground px-3 py-2 font-bold uppercase tracking-widest">القائمة</p>
+            {TABS.map(tab => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id || (activeTab === "add-product" && tab.id === "products");
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => navigate(tab.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-right ${
+                    isActive
+                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
+                      : "hover:bg-white/8 text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <span className="font-bold text-sm">{tab.label}</span>
+                </button>
+              );
+            })}
           </nav>
-        </div>
 
-        {/* Content */}
-        <div className="flex-1">
-          {activeTab === 'overview' && (
-            <div className="space-y-8 animate-in">
-              <h2 className="text-2xl font-bold">لوحة التحكم</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[
-                  { title: 'إجمالي الإيرادات', val: formatPrice(stats?.totalRevenue || 0), icon: <TrendingUp /> },
-                  { title: 'المنتجات النشطة', val: stats?.totalProducts || 0, icon: <Package /> },
-                  { title: 'الطلبات المكتملة', val: stats?.totalOrders || 0, icon: <ShoppingBag /> },
-                  { title: 'طلبات قيد الانتظار', val: stats?.pendingOrders || 0, icon: <Clock /> },
-                ].map((s, i) => (
-                  <div key={i} className="glass-panel p-6 rounded-2xl border-white/5">
-                    <div className="text-primary mb-4 opacity-80">{s.icon}</div>
-                    <div className="text-3xl font-black text-foreground">{s.val}</div>
-                    <div className="text-sm text-muted-foreground mt-1">{s.title}</div>
-                  </div>
-                ))}
-              </div>
+          {/* Sidebar Footer */}
+          <div className="p-4 border-t border-white/10">
+            <button
+              onClick={() => setLocation("/")}
+              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors text-sm"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span>العودة للمتجر</span>
+            </button>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 min-w-0 flex flex-col">
+          {/* Top bar */}
+          <div className="sticky top-16 z-30 flex items-center gap-3 px-4 md:px-8 py-3 bg-background/80 backdrop-blur-md border-b border-white/10">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden p-2 rounded-xl hover:bg-white/10 transition-colors"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <div className="flex-1">
+              <p className="font-bold text-sm">
+                {activeTab === "overview" && "لوحة التحكم"}
+                {activeTab === "products" && "إدارة المنتجات"}
+                {activeTab === "add-product" && "إضافة منتج"}
+                {activeTab === "orders" && "الطلبات الواردة"}
+                {activeTab === "sales" && "المبيعات والتحليلات"}
+                {activeTab === "discounts" && "أكواد الخصم"}
+              </p>
             </div>
-          )}
+            <button className="p-2 rounded-xl hover:bg-white/10 transition-colors relative">
+              <Bell className="w-5 h-5 text-muted-foreground" />
+              {(stats?.pendingOrders ?? 0) > 0 && (
+                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#c9a84c]" />
+              )}
+            </button>
+          </div>
 
-          {activeTab === 'products' && (
-            <div className="animate-in">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold">منتجاتي</h2>
-                <Button onClick={() => setActiveTab('add')} size="sm"><Plus className="w-4 h-4 mr-2" /> منتج جديد</Button>
-              </div>
-              <div className="glass-panel rounded-2xl overflow-hidden border-white/5">
-                <table className="w-full text-sm text-right">
-                  <thead className="bg-black/20 text-muted-foreground uppercase">
-                    <tr>
-                      <th className="px-6 py-4 font-bold">المنتج</th>
-                      <th className="px-6 py-4 font-bold">السعر</th>
-                      <th className="px-6 py-4 font-bold">الكمية</th>
-                      <th className="px-6 py-4 font-bold">القسم</th>
-                      <th className="px-6 py-4 font-bold">إجراء</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products?.map(p => (
-                      <tr key={p.id} className="border-b border-white/5 last:border-0 hover:bg-white/5">
-                        <td className="px-6 py-4 font-semibold">{p.name}</td>
-                        <td className="px-6 py-4 text-primary">{formatPrice(p.price)}</td>
-                        <td className="px-6 py-4">{p.quantity}</td>
-                        <td className="px-6 py-4">{p.category === 'textiles' ? 'أقمشة' : 'ملابس'}</td>
-                        <td className="px-6 py-4">
-                          <button onClick={() => deleteMut.mutate({ id: p.id })} className="text-destructive hover:text-red-400 p-2">
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'add' && (
-            <div className="animate-in max-w-2xl">
-              <h2 className="text-2xl font-bold mb-6">إضافة منتج جديد</h2>
-              <form onSubmit={handleSubmit(onSubmit)} className="glass-panel p-8 rounded-3xl space-y-6 border-white/5">
-                
+          {/* Page Content */}
+          <div className="flex-1 p-4 md:p-8">
+            {!isApproved && (
+              <div className="mb-6 p-4 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex items-start gap-3">
+                <span className="text-yellow-400 mt-0.5">⚠️</span>
                 <div>
-                  <label className="block text-sm mb-2">اسم المنتج</label>
-                  <Input {...register("name")} placeholder="مثال: قماش حرير طبيعي" />
-                  {errors.name && <p className="text-destructive text-xs mt-1">{errors.name.message as string}</p>}
+                  <p className="font-bold text-yellow-400 text-sm">حسابك قيد المراجعة</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">سيتم إخطارك عند اعتماد حسابك. يمكنك الاطلاع على الداشبورد في الوقت الحالي.</p>
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm mb-2">القسم</label>
-                    <select {...register("category")} className="w-full bg-background/50 border border-border rounded-xl px-4 h-12 text-sm focus:outline-none focus:border-primary">
-                      <option value="عباءات">عباءات</option>
-                      <option value="حجابات">حجابات</option>
-                      <option value="فساتين">فساتين</option>
-                      <option value="بدلات">بدلات</option>
-                      <option value="قمصان">قمصان</option>
-                      <option value="أقمشة">أقمشة</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm mb-2">سبب الخصم (الفائض)</label>
-                    <select {...register("discountReason")} className="w-full bg-background/50 border border-border rounded-xl px-4 h-12 text-sm focus:outline-none focus:border-primary">
-                      <option value="overstock">فائض مخزون</option>
-                      <option value="end_of_season">نهاية الموسم</option>
-                      <option value="minor_defect">عيب مصنعي بسيط</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm mb-2">السعر الأصلي</label>
-                    <Input type="number" {...register("originalPrice")} />
-                  </div>
-                  <div>
-                    <label className="block text-sm mb-2">السعر المخفض</label>
-                    <Input type="number" {...register("price")} />
-                  </div>
-                  <div>
-                    <label className="block text-sm mb-2">الكمية المتاحة</label>
-                    <Input type="number" {...register("quantity")} />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm mb-2">رابط الصورة (اختياري)</label>
-                  <Input {...register("imageUrl")} placeholder="https://..." dir="ltr" />
-                </div>
-
-                <div>
-                  <label className="block text-sm mb-2">الوصف</label>
-                  <textarea {...register("description")} className="w-full bg-background/50 border border-border rounded-xl p-4 h-24 text-sm focus:outline-none focus:border-primary resize-none"></textarea>
-                </div>
-
-                <Button type="submit" size="lg" className="w-full" isLoading={createMut.isPending}>
-                  نشر المنتج
-                </Button>
-              </form>
-            </div>
-          )}
-
-          {activeTab === 'orders' && (
-            <div className="animate-in">
-              <h2 className="text-2xl font-bold mb-6">الطلبات الواردة</h2>
-              <div className="space-y-4">
-                {orders?.map(o => (
-                  <div key={o.id} className="glass-panel p-6 rounded-2xl flex flex-col md:flex-row justify-between md:items-center gap-4 border-white/5">
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="font-bold text-lg">طلب #{o.id}</span>
-                        <span className={`text-xs px-2 py-1 rounded font-bold ${
-                          o.status === 'pending' ? 'bg-yellow-500/20 text-yellow-500' : 'bg-green-500/20 text-green-500'
-                        }`}>
-                          {translateOrderStatus(o.status)}
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">العميل: {o.customerName}</p>
-                      <p className="text-sm text-muted-foreground mt-1">{new Date(o.createdAt).toLocaleDateString('ar-SA')}</p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xl font-black text-primary">{formatPrice(o.totalPrice)}</div>
-                      <p className="text-xs text-muted-foreground">{o.items?.length || 0} منتجات</p>
-                    </div>
-                  </div>
-                ))}
-                {orders?.length === 0 && <p className="text-muted-foreground">لا توجد طلبات بعد.</p>}
               </div>
-            </div>
-          )}
+            )}
 
-        </div>
+            {activeTab === "overview" && <OverviewTab />}
+            {activeTab === "products" && (
+              <ProductsTab onAddProduct={() => navigate("add-product")} />
+            )}
+            {activeTab === "add-product" && (
+              <AddProductTab
+                onSuccess={() => navigate("products")}
+                onBack={() => navigate("products")}
+              />
+            )}
+            {activeTab === "orders" && <OrdersTab />}
+            {activeTab === "sales" && <SalesTab />}
+            {activeTab === "discounts" && <DiscountsTab />}
+          </div>
+        </main>
       </div>
     </Layout>
   );

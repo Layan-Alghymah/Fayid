@@ -29,6 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logoutMutation = useLogout({
     mutation: {
       onSuccess: () => {
+        localStorage.removeItem("auth_token");
         queryClient.setQueryData([`/api/auth/me`], null);
         queryClient.clear();
         setLocation("/");
