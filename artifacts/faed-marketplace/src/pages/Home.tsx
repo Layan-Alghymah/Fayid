@@ -149,6 +149,166 @@ export default function Home() {
         </div>
       </section>
       
+      {/* Partners / Brands */}
+      <section className="py-20 border-y border-white/5 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <p className="text-xs uppercase tracking-[0.3em] text-primary font-bold mb-3">شركاؤنا</p>
+            <h2 className="text-3xl md:text-4xl font-black mb-3">علامات تجارية تثق بفائض</h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">نفخر بشراكاتنا مع أبرز دور الأزياء والعلامات التجارية السعودية</p>
+          </div>
+
+          {/* Scrolling ticker */}
+          <div className="relative">
+            <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+            <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+            <div className="overflow-hidden">
+              <div className="flex gap-6 animate-[marquee_30s_linear_infinite] w-max">
+                {[
+                  { name: "أروى البنوي", sub: "ARWA AL BANAWI", accent: "#c9a84c" },
+                  { name: "هنيدة", sub: "HONAYDA", accent: "#195155" },
+                  { name: "ليم", sub: "LEEM", accent: "#c9a84c" },
+                  { name: "أوكتين", sub: "OKHTEIN", accent: "#0F3D4F" },
+                  { name: "لما جوني", sub: "LAMA JOUNI", accent: "#c9a84c" },
+                  { name: "سحر عطية", sub: "SAHAR ATIYA", accent: "#195155" },
+                  { name: "نور فارس", sub: "NOOR FARES", accent: "#c9a84c" },
+                  { name: "ديانا سلطان", sub: "DIANA SULTAN", accent: "#0F3D4F" },
+                  { name: "أروى البنوي", sub: "ARWA AL BANAWI", accent: "#c9a84c" },
+                  { name: "هنيدة", sub: "HONAYDA", accent: "#195155" },
+                  { name: "ليم", sub: "LEEM", accent: "#c9a84c" },
+                  { name: "أوكتين", sub: "OKHTEIN", accent: "#0F3D4F" },
+                  { name: "لما جوني", sub: "LAMA JOUNI", accent: "#c9a84c" },
+                  { name: "سحر عطية", sub: "SAHAR ATIYA", accent: "#195155" },
+                  { name: "نور فارس", sub: "NOOR FARES", accent: "#c9a84c" },
+                  { name: "ديانا سلطان", sub: "DIANA SULTAN", accent: "#0F3D4F" },
+                ].map((brand, i) => (
+                  <div
+                    key={i}
+                    className="flex-shrink-0 flex flex-col items-center justify-center gap-1 px-10 py-6 rounded-2xl border border-white/8 bg-white/3 backdrop-blur-sm hover:border-white/20 transition-all duration-300 min-w-[180px] group hover:scale-105"
+                  >
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-black mb-1"
+                      style={{ background: `${brand.accent}22`, color: brand.accent }}
+                    >
+                      {brand.name[0]}
+                    </div>
+                    <p className="font-black text-sm text-foreground leading-tight">{brand.name}</p>
+                    <p className="text-[9px] tracking-[0.25em] text-muted-foreground">{brand.sub}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Stats bar */}
+          <div className="grid grid-cols-3 gap-6 mt-16 max-w-2xl mx-auto">
+            {[
+              { val: "+500", label: "علامة تجارية موثوقة" },
+              { val: "+٢٠٠K", label: "منتج متاح" },
+              { val: "٩٨٪", label: "رضا الموردين" },
+            ].map((s, i) => (
+              <div key={i} className="text-center">
+                <p className="text-3xl font-black text-gradient-gold">{s.val}</p>
+                <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Our Designers */}
+      <section className="py-24 bg-muted/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <p className="text-xs uppercase tracking-[0.3em] text-primary font-bold mb-3">المصممون الشركاء</p>
+            <h2 className="text-3xl md:text-4xl font-black mb-3">مصمّمونا</h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">نتشرف بالتعاون مع نخبة من المصممين العالميين والمحليين لإيصال فائضهم إلى العالم</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            {[
+              {
+                name: "يحيى البشري",
+                nameEn: "YAHYA AL-BISHRI",
+                title: "مصمم أزياء سعودي",
+                bio: "أحد رواد الموضة السعودية، يجمع بين الهوية العربية والحداثة في تصاميمه للأزياء الفاخرة. بدأ مسيرته في باريس وعاد ليُحدث أثراً عميقاً في المشهد الإبداعي السعودي.",
+                tags: ["عباءات فاخرة", "أزياء سهرة", "تصميم معاصر"],
+                initials: "ي.ب",
+                gradient: "from-[#0F3D4F] to-[#195155]",
+                accentColor: "#c9a84c",
+              },
+              {
+                name: "أليكسندر كابيلي",
+                nameEn: "ALEXANDER CAPELLI",
+                title: "مصمم إيطالي — دار كابيلي",
+                bio: "مصمم إيطالي بارز أسس دار كابيلي في ميلانو عام ١٩٩٨. تميّزت تصاميمه بالأناقة الكلاسيكية المعاصرة ويتمتع بحضور واسع في أسواق الخليج والمملكة العربية السعودية.",
+                tags: ["هوت كوتور", "أزياء رجالية", "دار أزياء"],
+                initials: "A.C",
+                gradient: "from-[#1a0a2e] to-[#2d1b69]",
+                accentColor: "#a78bfa",
+              },
+            ].map((designer, i) => (
+              <div
+                key={i}
+                className="group relative overflow-hidden rounded-3xl border border-white/10 hover:border-white/20 transition-all duration-500 hover:-translate-y-1"
+              >
+                {/* Background gradient */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${designer.gradient} opacity-60`} />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.05),transparent_70%)]" />
+
+                <div className="relative p-8 flex gap-6">
+                  {/* Avatar */}
+                  <div className="flex-shrink-0">
+                    <div
+                      className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-black border-2 shadow-xl"
+                      style={{
+                        background: `${designer.accentColor}22`,
+                        borderColor: `${designer.accentColor}44`,
+                        color: designer.accentColor,
+                        fontFamily: "'Cairo', sans-serif",
+                      }}
+                    >
+                      {designer.initials}
+                    </div>
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <div>
+                        <h3 className="text-xl font-black text-white">{designer.name}</h3>
+                        <p className="text-[10px] tracking-[0.2em] text-white/50 font-mono uppercase">{designer.nameEn}</p>
+                      </div>
+                      <span
+                        className="text-xs px-2.5 py-1 rounded-full font-bold flex-shrink-0 border"
+                        style={{ background: `${designer.accentColor}20`, color: designer.accentColor, borderColor: `${designer.accentColor}30` }}
+                      >
+                        شريك
+                      </span>
+                    </div>
+                    <p className="text-sm font-semibold mb-3" style={{ color: designer.accentColor }}>{designer.title}</p>
+                    <p className="text-sm text-white/60 leading-relaxed mb-4">{designer.bio}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {designer.tags.map(tag => (
+                        <span key={tag} className="text-[11px] px-2.5 py-1 rounded-lg bg-white/8 text-white/60 border border-white/10">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom decorative line */}
+                <div
+                  className="absolute bottom-0 left-0 right-0 h-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: `linear-gradient(to right, transparent, ${designer.accentColor}, transparent)` }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Decorative banner */}
       <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
