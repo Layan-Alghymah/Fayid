@@ -29,11 +29,33 @@ export function translateDiscountReason(reason?: string | null) {
 
 export function translateOrderStatus(status: string) {
   switch (status) {
-    case 'pending': return 'قيد الانتظار';
-    case 'confirmed': return 'مؤكد';
-    case 'shipped': return 'تم الشحن';
-    case 'delivered': return 'تم التوصيل';
+    case 'pending':   return 'تم استلام الطلب';
+    case 'confirmed': return 'قيد التجهيز';
+    case 'shipped':   return 'مع المندوب';
+    case 'delivered': return 'تم التسليم';
     case 'cancelled': return 'ملغي';
-    default: return status;
+    default:          return status;
   }
+}
+
+export function translatePaymentMethod(method?: string | null) {
+  switch (method) {
+    case 'mada':   return 'مدى';
+    case 'tabby':  return 'تمارا / تمويلية';
+    case 'stcpay': return 'STC Pay';
+    case 'cod':    return 'الدفع عند الاستلام';
+    default:       return method ?? '—';
+  }
+}
+
+export function mockTrackingNumber(orderId: number) {
+  return `FAD${String(orderId).padStart(8, '0')}SA`;
+}
+
+export function formatDate(dateStr: string) {
+  return new Intl.DateTimeFormat('ar-SA', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(new Date(dateStr));
 }

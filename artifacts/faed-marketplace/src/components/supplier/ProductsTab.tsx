@@ -54,6 +54,16 @@ export function ProductsTab({ onAddProduct }: ProductsTabProps) {
     return <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 flex items-center gap-1 w-fit"><CheckCircle className="w-3 h-3" />{qty} قطعة</span>;
   }
 
+  function ProductStatusBadge({ isActive, qty }: { isActive: boolean; qty: number }) {
+    if (!isActive)
+      return <span className="text-xs px-2 py-0.5 rounded-full bg-white/5 text-muted-foreground border border-white/10 flex items-center gap-1 w-fit">موقوف</span>;
+    if (qty === 0)
+      return <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/20 flex items-center gap-1 w-fit"><AlertTriangle className="w-3 h-3" />نفد المخزون</span>;
+    if (qty < 10)
+      return <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/20 flex items-center gap-1 w-fit"><AlertTriangle className="w-3 h-3" />مخزون منخفض</span>;
+    return <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 border border-green-500/20 flex items-center gap-1 w-fit"><CheckCircle className="w-3 h-3" />نشط</span>;
+  }
+
   return (
     <div className="animate-in fade-in duration-300 space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -108,6 +118,7 @@ export function ProductsTab({ onAddProduct }: ProductsTabProps) {
                 <th className="px-5 py-3 font-bold hidden md:table-cell">القسم</th>
                 <th className="px-5 py-3 font-bold">السعر</th>
                 <th className="px-5 py-3 font-bold hidden sm:table-cell">المخزون</th>
+                <th className="px-5 py-3 font-bold hidden md:table-cell">الحالة</th>
                 <th className="px-5 py-3 font-bold">إجراءات</th>
               </tr>
             </thead>
@@ -131,6 +142,7 @@ export function ProductsTab({ onAddProduct }: ProductsTabProps) {
                       <td className="px-5 py-3 hidden md:table-cell text-muted-foreground">{p.category}</td>
                       <td className="px-5 py-3 font-bold text-primary">{formatPrice(p.price)}</td>
                       <td className="px-5 py-3 hidden sm:table-cell"><StockBadge qty={p.quantity} /></td>
+                      <td className="px-5 py-3 hidden md:table-cell"><ProductStatusBadge isActive={p.isActive} qty={p.quantity} /></td>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-1">
                           <button

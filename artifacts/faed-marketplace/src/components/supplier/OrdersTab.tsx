@@ -16,12 +16,12 @@ export function OrdersTab() {
   const [expanded, setExpanded] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState("الكل");
 
-  const statusOptions = ["الكل", "قيد الانتظار", "مؤكد", "تم الشحن", "تم التوصيل", "ملغي"];
+  const statusOptions = ["الكل", "تم استلام الطلب", "قيد التجهيز", "تم الشحن", "تم التسليم", "ملغي"];
   const statusMap: Record<string, string> = {
-    "قيد الانتظار": "pending",
-    "مؤكد": "confirmed",
+    "تم استلام الطلب": "pending",
+    "قيد التجهيز": "confirmed",
     "تم الشحن": "shipped",
-    "تم التوصيل": "delivered",
+    "تم التسليم": "delivered",
     "ملغي": "cancelled",
   };
 

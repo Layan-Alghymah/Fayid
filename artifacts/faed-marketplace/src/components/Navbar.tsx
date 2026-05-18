@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
-import { ShoppingCart, Search, Menu, User as UserIcon, LogOut, Package, LayoutDashboard } from "lucide-react";
+import { ShoppingCart, Search, Menu, User as UserIcon, LogOut, Package, ClipboardList } from "lucide-react";
 import { Button } from "./ui/Button";
 import { useGetCart } from "@workspace/api-client-react";
 import { useState } from "react";
@@ -64,6 +64,14 @@ export function Navbar() {
           <div className="flex items-center gap-3">
             {isAuthenticated ? (
               <>
+                {user?.role === 'buyer' && (
+                  <Link href="/orders">
+                    <Button variant="ghost" size="icon" className="text-foreground hover:bg-white/5 rounded-full" title="طلباتي">
+                      <ClipboardList className="w-5 h-5" />
+                    </Button>
+                  </Link>
+                )}
+
                 <Link href="/cart">
                   <Button variant="ghost" size="icon" className="relative text-foreground hover:bg-white/5 rounded-full">
                     <ShoppingCart className="w-5 h-5" />
@@ -88,14 +96,6 @@ export function Navbar() {
                       </Button>
                     </Link>
                   )}
-                  {user?.role === 'admin' && (
-                    <Link href="/admin">
-                      <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary hover:bg-white/5 rounded-full" title="لوحة الإدارة">
-                        <LayoutDashboard className="w-5 h-5" />
-                      </Button>
-                    </Link>
-                  )}
-
                   <Button variant="ghost" size="icon" onClick={logout} className="text-muted-foreground hover:text-destructive hover:bg-white/5 rounded-full" title="تسجيل الخروج">
                     <LogOut className="w-5 h-5" />
                   </Button>
@@ -139,14 +139,14 @@ export function Navbar() {
               </div>
             ) : (
               <div className="flex flex-col gap-2 mt-2">
+                {user?.role === 'buyer' && (
+                  <Link href="/orders" className="text-foreground py-2 font-semibold flex items-center gap-2">
+                    <ClipboardList className="w-4 h-4"/> طلباتي
+                  </Link>
+                )}
                 {user?.role === 'supplier' && (
                   <Link href="/supplier" className="text-primary py-2 font-semibold flex items-center gap-2">
                     <Package className="w-4 h-4"/> لوحة المورد
-                  </Link>
-                )}
-                {user?.role === 'admin' && (
-                  <Link href="/admin" className="text-primary py-2 font-semibold flex items-center gap-2">
-                    <LayoutDashboard className="w-4 h-4"/> لوحة الإدارة
                   </Link>
                 )}
                 <button onClick={logout} className="text-destructive py-2 font-semibold flex items-center gap-2 text-right">

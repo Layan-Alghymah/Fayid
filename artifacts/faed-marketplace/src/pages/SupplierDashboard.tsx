@@ -12,9 +12,11 @@ import { OrdersTab } from "@/components/supplier/OrdersTab";
 import { SalesTab } from "@/components/supplier/SalesTab";
 import { DiscountsTab } from "@/components/supplier/DiscountsTab";
 import { AddProductTab } from "@/components/supplier/AddProductTab";
-import { useGetSupplierStats } from "@workspace/api-client-react";
+import { NotificationsTab } from "@/components/supplier/NotificationsTab";
+import { StoreTab } from "@/components/supplier/StoreTab";
+import { useGetSupplierStats, useListSupplierOrders, useListSupplierProducts } from "@workspace/api-client-react";
 
-type TabId = "overview" | "products" | "add-product" | "orders" | "sales" | "discounts";
+type TabId = "overview" | "products" | "add-product" | "orders" | "sales" | "discounts" | "notifications" | "store";
 
 const TABS = [
   { id: "overview" as TabId, label: "الرئيسية", icon: LayoutDashboard },
@@ -22,6 +24,8 @@ const TABS = [
   { id: "orders" as TabId, label: "الطلبات", icon: ShoppingBag },
   { id: "sales" as TabId, label: "المبيعات", icon: TrendingUp },
   { id: "discounts" as TabId, label: "أكواد الخصم", icon: Tag },
+  { id: "notifications" as TabId, label: "الإشعارات", icon: Bell },
+  { id: "store" as TabId, label: "متجري", icon: Store },
 ];
 
 export default function SupplierDashboard() {
@@ -30,6 +34,13 @@ export default function SupplierDashboard() {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { data: stats } = useGetSupplierStats();
+  const { data: orders } = useListSupplierOrders();
+  const { data: products } = useListSupplierProducts();
+
+  // Count unread notifications (pending orders + low/out-of-stock products)
+  const pendingOrderCount = (orders ?? []).filter((o) => o.status === "pending").length;
+  const stockAlertCount = (products ?? []).filter((p) => p.isActive && p.quantity < 10).length;
+  const notifUnreadCount = pendingOrderCount + stockAlertCount;
 
   useEffect(() => {
     if (!isLoading && (!user || user.role !== "supplier")) {
@@ -134,7 +145,14 @@ export default function SupplierDashboard() {
                   }`}
                 >
                   <Icon className="w-4 h-4 flex-shrink-0" />
-                  <span className="font-bold text-sm">{tab.label}</span>
+                  <span className="font-bold text-sm flex-1">{tab.label}</span>
+                  {tab.id === "notifications" && notifUnreadCount > 0 && (
+                    <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${
+                      isActive ? "bg-white/20 text-white" : "bg-primary/30 text-primary"
+                    }`}>
+                      {notifUnreadCount > 9 ? "9+" : notifUnreadCount}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -170,12 +188,20 @@ export default function SupplierDashboard() {
                 {activeTab === "orders" && "الطلبات الواردة"}
                 {activeTab === "sales" && "المبيعات والتحليلات"}
                 {activeTab === "discounts" && "أكواد الخصم"}
+                {activeTab === "notifications" && "الإشعارات"}
+                {activeTab === "store" && "معلومات المتجر"}
               </p>
             </div>
-            <button className="p-2 rounded-xl hover:bg-white/10 transition-colors relative">
+            <button
+              onClick={() => navigate("notifications")}
+              className="p-2 rounded-xl hover:bg-white/10 transition-colors relative"
+              title="الإشعارات"
+            >
               <Bell className="w-5 h-5 text-muted-foreground" />
-              {(stats?.pendingOrders ?? 0) > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#c9a84c]" />
+              {notifUnreadCount > 0 && (
+                <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 bg-primary text-primary-foreground text-[9px] font-black rounded-full flex items-center justify-center">
+                  {notifUnreadCount > 9 ? "9+" : notifUnreadCount}
+                </span>
               )}
             </button>
           </div>
@@ -205,6 +231,8 @@ export default function SupplierDashboard() {
             {activeTab === "orders" && <OrdersTab />}
             {activeTab === "sales" && <SalesTab />}
             {activeTab === "discounts" && <DiscountsTab />}
+            {activeTab === "notifications" && <NotificationsTab />}
+            {activeTab === "store" && <StoreTab />}
           </div>
         </main>
       </div>
