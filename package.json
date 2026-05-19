@@ -3,11 +3,12 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-  "build": "pnpm config set ignore-scripts false && pnpm install && pnpm --filter @workspace/faed-marketplace build",
-  "typecheck:libs": "tsc --build",
-  "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/*\" run typecheck"
-  }
-  "private": true,
+    "build": "pnpm config set ignore-scripts false && pnpm install && pnpm --filter @workspace/faed-marketplace build",
+    "typecheck:libs": "tsc --build",
+    "typecheck": "pnpm run typecheck:libs && pnpm -r --if-present run typecheck"
+  },
+  "private": true
+}
   "devDependencies": {
     "@rollup/rollup-win32-x64-msvc": "^4.60.4",
     "prettier": "^3.8.1",
