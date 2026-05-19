@@ -4,15 +4,13 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "postinstall": "cd artifacts/faed-marketplace && npm install",
+    "dev": "cd artifacts/faed-marketplace && npm run dev",
     "build": "cd artifacts/faed-marketplace && npm install && npm run build",
-    "typecheck:libs": "tsc --build",
-    "typecheck": "pnpm run typecheck:libs && pnpm -r --if-present run typecheck"
+    "preview": "cd artifacts/faed-marketplace && npm run serve"
   },
   "devDependencies": {
     "prettier": "^3.8.1",
     "typescript": "~5.9.2"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": ["esbuild", "@swc/core", "msw", "unrs-resolver"]
   }
 }

@@ -10,7 +10,10 @@
       "mcp__ide__getDiagnostics",
       "Bash(xargs head:*)",
       "Bash(npm install:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(test:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)"
     ]
   }
 }
