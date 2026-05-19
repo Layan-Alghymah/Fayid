@@ -4,7 +4,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-  "build": "pnpm install --recursive && pnpm --filter @workspace/faed-marketplace build",
+  "build": "pnpm install --allow-scripts=all --recursive && pnpm --filter @workspace/faed-marketplace build",
   "typecheck:libs": "tsc --build",
   "typecheck": "pnpm run typecheck:libs && pnpm -r --if-present run typecheck"
   },
