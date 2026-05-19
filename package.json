@@ -6,7 +6,7 @@
   "scripts": {
     "postinstall": "cd artifacts/faed-marketplace && npm install",
     "dev": "cd artifacts/faed-marketplace && npm run dev",
-    "build": "cd artifacts/faed-marketplace && npm install && npm run build",
+    "build": "cd artifacts/faed-marketplace && npm run build",
     "preview": "cd artifacts/faed-marketplace && npm run serve"
   },
   "devDependencies": {
