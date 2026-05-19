@@ -28,7 +28,13 @@ async function buildOrderResponse(order: any) {
   };
 }
 
+const SUPPLIER_ORDER_ERROR = "حساب المورد مخصص لإدارة المنتجات والطلبات، ولا يمكنه إتمام عمليات الشراء.";
+
 router.get("/orders", requireAuth, async (req, res): Promise<void> => {
+  if (req.user!.role === "supplier") {
+    res.status(403).json({ error: SUPPLIER_ORDER_ERROR });
+    return;
+  }
   const orders = await db
     .select()
     .from(ordersTable)
@@ -40,6 +46,10 @@ router.get("/orders", requireAuth, async (req, res): Promise<void> => {
 });
 
 router.post("/orders", requireAuth, async (req, res): Promise<void> => {
+  if (req.user!.role === "supplier") {
+    res.status(403).json({ error: SUPPLIER_ORDER_ERROR });
+    return;
+  }
   const parsed = CreateOrderBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });

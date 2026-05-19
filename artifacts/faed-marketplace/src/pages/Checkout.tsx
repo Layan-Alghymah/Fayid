@@ -150,7 +150,7 @@ const STEPS = [
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function Checkout() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const { data: cart, isLoading: cartLoading } = useGetCart();
   const [step, setStep] = useState(1);
   const [, setLocation] = useLocation();
@@ -249,6 +249,11 @@ export default function Checkout() {
 
   if (!isAuthenticated) {
     setLocation("/login");
+    return null;
+  }
+
+  if (user?.role === 'supplier') {
+    setLocation("/supplier");
     return null;
   }
 

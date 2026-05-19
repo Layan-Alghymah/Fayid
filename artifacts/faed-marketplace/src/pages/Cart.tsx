@@ -6,9 +6,11 @@ import { Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Cart() {
-  const { data: cart, isLoading } = useGetCart();
+  const { user } = useAuth();
+  const { data: cart, isLoading } = useGetCart({ query: { enabled: user?.role !== 'supplier' } });
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -27,6 +29,11 @@ export default function Cart() {
       }
     }
   });
+
+  if (user?.role === 'supplier') {
+    setLocation("/supplier");
+    return null;
+  }
 
   if (isLoading) {
     return (

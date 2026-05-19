@@ -16,7 +16,8 @@ export default function ProductDetail() {
   
   const { data: product, isLoading } = useGetProduct(id);
   const [quantity, setQuantity] = useState(1);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const isSupplier = user?.role === 'supplier';
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -68,6 +69,7 @@ export default function ProductDetail() {
       setLocation("/login");
       return;
     }
+    if (isSupplier) return;
     addToCartMutation.mutate({ data: { productId: product.id, quantity } });
   };
 
@@ -149,30 +151,36 @@ export default function ProductDetail() {
 
             {/* Actions */}
             <div className="mt-auto pt-8 border-t border-white/10">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="flex items-center bg-background border border-border rounded-xl h-14 px-2">
-                  <button 
-                    className="w-10 h-10 flex items-center justify-center text-xl text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-lg transition-colors"
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  >-</button>
-                  <span className="w-12 text-center font-bold text-lg">{quantity}</span>
-                  <button 
-                    className="w-10 h-10 flex items-center justify-center text-xl text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-lg transition-colors"
-                    onClick={() => setQuantity(Math.min(product.quantity, quantity + 1))}
-                  >+</button>
+              {isSupplier ? (
+                <div className="glass-panel rounded-xl p-4 text-center text-sm text-muted-foreground">
+                  حساب المورد مخصص لإدارة المنتجات والطلبات، ولا يمكنه إتمام عمليات الشراء.
                 </div>
-                
-                <Button 
-                  size="lg" 
-                  className="flex-1 h-14 text-lg shadow-xl shadow-primary/20"
-                  onClick={handleAddToCart}
-                  isLoading={addToCartMutation.isPending}
-                  disabled={product.quantity === 0}
-                >
-                  <ShoppingCart className="w-5 h-5 ml-2" />
-                  {product.quantity === 0 ? 'نفذت الكمية' : 'إضافة للسلة'}
-                </Button>
-              </div>
+              ) : (
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="flex items-center bg-background border border-border rounded-xl h-14 px-2">
+                    <button
+                      className="w-10 h-10 flex items-center justify-center text-xl text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-lg transition-colors"
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    >-</button>
+                    <span className="w-12 text-center font-bold text-lg">{quantity}</span>
+                    <button
+                      className="w-10 h-10 flex items-center justify-center text-xl text-muted-foreground hover:text-foreground hover:bg-white/5 rounded-lg transition-colors"
+                      onClick={() => setQuantity(Math.min(product.quantity, quantity + 1))}
+                    >+</button>
+                  </div>
+
+                  <Button
+                    size="lg"
+                    className="flex-1 h-14 text-lg shadow-xl shadow-primary/20"
+                    onClick={handleAddToCart}
+                    isLoading={addToCartMutation.isPending}
+                    disabled={product.quantity === 0}
+                  >
+                    <ShoppingCart className="w-5 h-5 ml-2" />
+                    {product.quantity === 0 ? 'نفذت الكمية' : 'إضافة للسلة'}
+                  </Button>
+                </div>
+              )}
             </div>
 
           </div>

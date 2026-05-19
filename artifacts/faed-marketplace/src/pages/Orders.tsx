@@ -137,7 +137,7 @@ function OrderCard({ order }: { order: Order }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Orders() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const [, setLocation] = useLocation();
   const [tab, setTab] = useState<FilterTab>("all");
 
@@ -157,6 +157,11 @@ export default function Orders() {
 
   if (!isAuthenticated) {
     setLocation("/login");
+    return null;
+  }
+
+  if (user?.role === 'supplier') {
+    setLocation("/supplier");
     return null;
   }
 

@@ -72,16 +72,18 @@ export function Navbar() {
                   </Link>
                 )}
 
-                <Link href="/cart">
-                  <Button variant="ghost" size="icon" className="relative text-foreground hover:bg-white/5 rounded-full">
-                    <ShoppingCart className="w-5 h-5" />
-                    {cartItemsCount > 0 && (
-                      <span className="absolute top-1 right-1 w-4 h-4 bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center rounded-full">
-                        {cartItemsCount}
-                      </span>
-                    )}
-                  </Button>
-                </Link>
+                {user?.role !== 'supplier' && (
+                  <Link href="/cart">
+                    <Button variant="ghost" size="icon" className="relative text-foreground hover:bg-white/5 rounded-full">
+                      <ShoppingCart className="w-5 h-5" />
+                      {cartItemsCount > 0 && (
+                        <span className="absolute top-1 right-1 w-4 h-4 bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center rounded-full">
+                          {cartItemsCount}
+                        </span>
+                      )}
+                    </Button>
+                  </Link>
+                )}
 
                 <div className="hidden sm:flex items-center gap-2 border-r border-white/10 pr-4 mr-2">
                   <div className="flex flex-col text-left">

@@ -44,12 +44,22 @@ async function getCartWithProducts(userId: number) {
   return { items: enrichedItems, total };
 }
 
+const SUPPLIER_CART_ERROR = "حساب المورد مخصص لإدارة المنتجات والطلبات، ولا يمكنه إتمام عمليات الشراء.";
+
 router.get("/cart", requireAuth, async (req, res): Promise<void> => {
+  if (req.user!.role === "supplier") {
+    res.status(403).json({ error: SUPPLIER_CART_ERROR });
+    return;
+  }
   const cart = await getCartWithProducts(req.user!.userId);
   res.json(cart);
 });
 
 router.post("/cart/items", requireAuth, async (req, res): Promise<void> => {
+  if (req.user!.role === "supplier") {
+    res.status(403).json({ error: SUPPLIER_CART_ERROR });
+    return;
+  }
   const parsed = AddToCartBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -78,6 +88,10 @@ router.post("/cart/items", requireAuth, async (req, res): Promise<void> => {
 });
 
 router.patch("/cart/items/:productId", requireAuth, async (req, res): Promise<void> => {
+  if (req.user!.role === "supplier") {
+    res.status(403).json({ error: SUPPLIER_CART_ERROR });
+    return;
+  }
   const paramsParsed = UpdateCartItemParams.safeParse(req.params);
   if (!paramsParsed.success) {
     res.status(400).json({ error: paramsParsed.error.message });
@@ -110,6 +124,10 @@ router.patch("/cart/items/:productId", requireAuth, async (req, res): Promise<vo
 });
 
 router.delete("/cart/items/:productId", requireAuth, async (req, res): Promise<void> => {
+  if (req.user!.role === "supplier") {
+    res.status(403).json({ error: SUPPLIER_CART_ERROR });
+    return;
+  }
   const parsed = RemoveFromCartParams.safeParse(req.params);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });

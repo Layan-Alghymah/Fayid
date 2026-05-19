@@ -199,7 +199,7 @@ function DetailRow({ icon, label, value }: { icon: React.ReactNode; label: strin
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function OrderDetail() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const params = useParams<{ id: string }>();
   const [, setLocation] = useLocation();
 
@@ -223,6 +223,11 @@ export default function OrderDetail() {
 
   if (!isAuthenticated) {
     setLocation("/login");
+    return null;
+  }
+
+  if (user?.role === 'supplier') {
+    setLocation("/supplier");
     return null;
   }
 
